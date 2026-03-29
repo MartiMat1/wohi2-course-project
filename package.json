@@ -1,0 +1,16 @@
+{
+  "name": "wohii-backend-exercise",
+  "version": "1.0.0",
+  "description": "WOHII project",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": ["uef"],
+  "author": "Matias Martikainen",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

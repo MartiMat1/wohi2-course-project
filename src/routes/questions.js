@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../lib/prisma");
-const questions = require("../data/questions");
-
-
+//const questions = require("../data/questions");
+const authenticate = require("../middleware/auth");
+const isOwner = require("../middleware/isOwner");
 
 function formatQuestions(question) {
   return {
@@ -12,6 +12,8 @@ function formatQuestions(question) {
   };
 }
 
+// Apply authentication to ALL routes in this router
+router.use(authenticate);
 
 // GET /questions
 // List all questions
@@ -66,6 +68,7 @@ router.post("/", async (req, res) => {
   const newQuestion = await prisma.questions.create({
     data: {
       question, answer,
+      userId: req.user.userId,
       keywords: {
         connectOrCreate: keywordsArray.map((kw) => ({
           where: { name: kw }, create: { name: kw },
@@ -77,11 +80,9 @@ router.post("/", async (req, res) => {
   res.status(201).json(formatQuestions(newQuestion));
 });
 
-
-
 // PUT /questions/:questionId
 // Edit question
-router.put("/:questionId", async (req, res) => {
+router.put("/:questionId", isOwner, async (req, res) => {
   const questionId = Number(req.params.questionId);
   const { question, answer, keywords } = req.body;
   const existingQuestion= await prisma.questions.findUnique({ where: { id: questionId } });
@@ -114,7 +115,7 @@ router.put("/:questionId", async (req, res) => {
 
 // DELETE /questions/:questionId
 // Delete question
-router.delete("/:quetionId", async (req, res) => {
+router.delete("/:questionId", isOwner, async (req, res) => {
   const questionId = Number(req.params.questionId);
 
   const question = await prisma.questions.findUnique({
@@ -133,13 +134,5 @@ router.delete("/:quetionId", async (req, res) => {
     post: formatQuestions(question),
   });
 });
-
-
-
-
-
-
-
-
 
 module.exports = router;

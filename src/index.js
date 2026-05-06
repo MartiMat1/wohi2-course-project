@@ -3,6 +3,10 @@ const app = express();
 const questionsRouter = require("./routes/questions");
 const authRouter = require("./routes/auth");
 const prisma = require("./lib/prisma");
+const PORT = process.env.PORT || 3000;
+const path = require("path");
+
+app.use(express.static(path.join(__dirname,"..","public")));
 
 // Routes
 // Middleware to parse JSON bodies (will be useful in later steps)
@@ -14,9 +18,6 @@ app.use("/api/auth", authRouter)
 app.use((req, res) => {
   res.json({msg: "Not found"});
 });
-
-
-const PORT = process.env.PORT || 3000;
 
 // Start the server
 app.listen(PORT, () => {

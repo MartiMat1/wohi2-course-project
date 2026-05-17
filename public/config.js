@@ -12,7 +12,8 @@ const CONFIG = {
   },
   QUESTIONS_PER_PAGE: 5,
   STORAGE_KEY: "jwt_token",
+  
   API_FIELDS: {
-    SOLVED: "attemptCount",
+    SOLVED: "correct",
   },
 };

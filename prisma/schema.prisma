@@ -44,6 +44,7 @@ model Attempt {
   user     User     @relation(fields: [userId], references: [id])
   questionsId   Int
   question questions @relation(fields: [questionsId], references: [id])
+  correct     Boolean @default(false)
 
   @@unique([userId, questionsId])
   @@map("attempts")

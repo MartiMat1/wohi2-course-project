@@ -8,4 +8,4 @@
 ALTER TABLE `questions` ADD COLUMN `correct` BOOLEAN NOT NULL DEFAULT false;
 
 -- AlterTable
-ALTER TABLE `user` DROP COLUMN `correct`;
+ALTER TABLE `User` DROP COLUMN `correct`;

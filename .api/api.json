@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "smtp2goapi",
+      "source": "@smtp2goapi/v3.0.4#4xal6xmpaj2ioy",
+      "integrity": "sha512-JhO0BS00YSstzYzh0TYJcEC6ZYegZ7QMIomJ5iAPLGp09dNp0fp+6PoTWQLCsRTeB73BFyYuHRJJB1w25yWw3Q==",
+      "installerVersion": "6.1.3"
+    }
+  ]
+}

@@ -14,6 +14,8 @@ model User {
   name     String @db.VarChar(100)
   question    questions[]
   attempts    Attempt[]
+  isVerified        Boolean  @default(false)
+  verificationToken String?
 }
 
 model questions {

@@ -592,7 +592,18 @@
       padding: 2rem;
       color: #888;
     }
+
   </style>
+
+<html>
+<head>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+  <script>
+    function onRecaptchaSuccess(token) {
+      document.getElementById("recaptcha-token").value = token;
+    }
+  </script>
 </head>
 <body>
   <header>
@@ -606,9 +617,12 @@
     <section id="app-section" style="display: none">
       <div id="questions-container"></div>
     </section>
+    
   </main>
 
   <script src="config.js"></script>
   <script src="app.js"></script>
+
+  
 </body>
 </html>

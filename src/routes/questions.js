@@ -1,20 +1,31 @@
 const express = require("express");
 const router = express.Router();
 const prisma = require("../lib/prisma");
-//const questions = require("../data/questions");
 const authenticate = require("../middleware/auth");
 const isOwner = require("../middleware/isOwner");
 const multer = require("multer");
 const path = require("path");
 const { NotFoundError,ValidationError } = require("../lib/errors");
 const {z} = require("zod");
+const cloudinary = require("cloudinary").v2;
+require("dotenv").config;
+require("dotenv").config({ path: ".env.cloudinary" });
 
+//CLOUDINARY
+cloudinary.config({
+  cloud_name: "dznddvcvp",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+//INPUT
 const questionInput = z.object({
   question: z.string().min(1),
   answer: z.string().min(1),
   keywords: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
+//MULTER
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "..","..","public","uploads"),
   filename: (req, file, cb) => {
@@ -33,6 +44,7 @@ const upload = multer({
   limits: {fileSize: 5*1024*1024}
 })
 
+//FORMAT
 function formatQuestions(question) {
   return {
     ...question,
@@ -118,20 +130,21 @@ router.use((err, req, res, next) => {
 
 // POST /questions
 // Create a new post
-
 router.post("/", upload.single("image"), async (req, res) => {
-   
+
+  const uploadImg = await cloudinary.uploader.upload(req.file.path);
+
   const {question, answer, keywords} = questionInput.parse(req.body);
 
   const keywordsArray = Array.isArray(keywords) ? keywords : [];
-  const imageUrl = req.file ? `/uploads/${req.file.filename}`: null;
+  //const imageUrl = req.file ? `/uploads/${req.file.filename}`: null;
 
   const newQuestion = await prisma.questions.create({
     data: {
       question,
       answer,
       userId: req.user.userId,
-      imageUrl,
+      imageUrl: uploadImg.secure_url,
       keywords: {
         connectOrCreate: keywordsArray.map((kw) => ({
           where: { name: kw }, create: { name: kw },
@@ -160,14 +173,16 @@ router.put("/:questionId", upload.single("image"), isOwner, async (req, res) => 
     throw new ValidationError("Question and answer are mandatory")
   }
 
+  const uploadImg= await cloudinary.uploader.upload(req.file.path);
+
   const keywordsArray = Array.isArray(keywords) ? keywords : [];
-  const imageUrl = req.file ? `/uploads/${req.file.filename}`: null;
+  //const imageUrl = req.file ? `/uploads/${req.file.filename}`: null;
   const updatedQuestion = await prisma.questions.update({
     where: { id: questionId },
     data: {
       question,
       answer,
-      imageUrl,
+      imageUrl: uploadImg.secure_url,
       keywords: {
         set: [],
         connectOrCreate: keywordsArray.map((kw) => ({
@@ -185,7 +200,6 @@ router.put("/:questionId", upload.single("image"), isOwner, async (req, res) => 
 
 // DELETE /questions/:questionId
 // Delete question
-
 router.delete("/:questionId", isOwner, async (req, res) => {
   const questionId = Number(req.params.questionId);
 
@@ -208,7 +222,7 @@ router.delete("/:questionId", isOwner, async (req, res) => {
 });
 
 
-//Attempt
+//POST ATTEMPT
 router.post("/:questionId/attempt", async (req, res) => {
     const questionId = Number(req.params.questionId);
     const { answer } = req.body;
@@ -245,7 +259,7 @@ router.post("/:questionId/attempt", async (req, res) => {
     });
 }); 
 
-//Delete attempts
+//DELETE ATTEMPT
 router.delete("/:questionId/attempt", async (req, res) => {
     const questionId = Number(req.params.questionId);
 

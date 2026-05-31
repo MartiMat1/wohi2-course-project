@@ -37,12 +37,23 @@ async function apiFetch(route, options = {}) {
   return data;
 }
 
+function onRecaptchaSuccess(token) {
+  const hidden = document.getElementById("recaptcha-token");
+  if (hidden) hidden.value = token;
+}
+
+
 // --- Auth ---
 function showAuth() {
   document.getElementById("auth-section").style.display = "block";
   document.getElementById("app-section").style.display = "none";
   document.getElementById("logout-btn").style.display = "none";
   renderAuthForm();
+}
+
+function onRecaptchaSuccess(token) {
+  const hidden = document.getElementById("recaptcha-token");
+  if (hidden) hidden.value = token;
 }
 
 function renderAuthForm() {
@@ -90,18 +101,22 @@ function renderAuthForm() {
     renderAuthForm();
   });
 
+  // --- reCAPTCHA RENDER FIX ---
   if (isRegisterMode) {
-  setTimeout(() => {
-    if (window.grecaptcha) {
-      grecaptcha.render(document.querySelector(".g-recaptcha"), {
-        sitekey: "6LdOxgAtAAAAACwHs4SZNwYqcIv4RSitlGgRYwDn",
-        callback: onRecaptchaSuccess
-      });
+    function waitForRecaptcha() {
+      if (window.grecaptcha && document.querySelector(".g-recaptcha")) {
+        grecaptcha.render(document.querySelector(".g-recaptcha"), {
+          sitekey: "6LdOxgAtAAAAACwHs4SZNwYqcIv4RSitlGgRYwDn",
+          callback: onRecaptchaSuccess
+        });
+      } else {
+        setTimeout(waitForRecaptcha, 100);
+      }
     }
-  }, 50);
+    waitForRecaptcha();
+  }
 }
 
-}
 
 
 async function handleAuth(e) {

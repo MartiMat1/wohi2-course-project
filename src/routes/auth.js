@@ -91,7 +91,7 @@ router.post("/login", async (req, res) => {
 
 //GET
 //VERIFY EMAIL
-router.get("/verify/:token", async (req, res) => {
+router.get("verify/:token", async (req, res) => {
   const { token } = req.params;
 
   const user = await prisma.user.findFirst({
